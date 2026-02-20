@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taniska Mondal - Story Workbook</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --pink-bold: #ff007f;
+            --galaxy-bg: #0d0221;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background: radial-gradient(circle, #240b36 0%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Moving Name Header */
+        .marquee {
+            width: 100%;
+            background: var(--pink-bold);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 10px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(255, 0, 127, 0.5);
+        }
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .btn-blue { background: #00d2ff; color: black; }
+        .btn-pink { background: var(--pink-bold); color: white; }
+        .btn:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+        /* Progress Bar */
+        .progress-wrap { width: 100%; height: 10px; background: #333; }
+        #progress-bar { width: 0%; height: 100%; background: var(--pink-bold); transition: 0.5s; }
+
+        /* Story Sheet */
+        .container {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .sheet {
+            background: white;
+            color: #333;
+            width: 100%;
+            max-width: 850px;
+            border-radius: 20px;
+            padding: 40px;
+            border: 8px solid var(--pink-bold);
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.4);
+        }
+
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .input-line {
+            border: none;
+            border-bottom: 2px solid #ccc;
+            font-size: 1.1rem;
+            width: 200px;
+            outline: none;
+        }
+
+        .story-title {
+            text-align: center;
+            color: var(--pink-bold);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .content-grid {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .story-text {
+            flex: 1;
+            font-size: 1.8rem;
+            line-height: 1.6;
+            /* Story Text strictly Pink and Bold */
+            color: var(--pink-bold);
+            font-weight: 800;
+        }
+
+        .image-box img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 15px;
+            border: 5px solid #eee;
+            /* Fallback background if image fails */
+            background: #ffe6f2; 
+        }
+
+        /* Question Section */
+        .question-area {
+            background: #fff0f6;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 10px solid var(--pink-bold);
+        }
+
+        .empty-box {
+            width: 150px;
+            height: 35px;
+            border: 2px solid var(--pink-bold);
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            color: #333;
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee">
+        <span>TANISKA MONDAL • STUDY TIME • TANISKA MONDAL • HAPPY LEARNING • TANISKA MONDAL</span>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-blue" onclick="nav(-1)">⬅ PREV</button>
+        <button class="btn btn-pink" onclick="readStory()">🔊 READ STORY</button>
+        <button class="btn btn-pink" onclick="finishStory()">FINISH & NEXT ➡</button>
+    </div>
+
+    <div class="progress-wrap"><div id="progress-bar"></div></div>
+
+    <div class="container">
+        <div class="sheet">
+            <div class="header-box">
+                <span>NAME: <input type="text" id="studentName" class="input-line"></span>
+                <span>DATE: <input type="text" class="input-line" style="width:100px;" value="20/02/2026"></span>
+            </div>
+
+            <h1 id="title-display" class="story-title">Loading...</h1>
+
+            <div class="content-grid">
+                <div id="text-display" class="story-text"></div>
+                <div class="image-box">
+                    <img id="main-img" src="" alt="Learning Visual">
+                </div>
+            </div>
+
+            <div class="question-area">
+                <h3 style="color:#333; margin-top:0;">Fill the box:</h3>
+                <div id="q-container" style="font-size:1.4rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 100 STORY DATABASE
+        const objects = ["Apple", "Ball", "Cat", "Dog", "Elephant", "Fish", "Goat", "Hat", "Ice Cream", "Jar", "Kite", "Lion", "Moon", "Nest", "Owl", "Panda", "Queen", "Rabbit", "Sun", "Tiger"];
+        const colors = ["Red", "Blue", "Green", "Yellow", "Pink", "Orange", "Purple", "White", "Black", "Gold"];
+        
+        const stories = [];
+        for(let i=1; i<=100; i++) {
+            let obj = objects[i % objects.length];
+            let col = colors[i % colors.length];
+            stories.push({
+                title: `Lesson ${i}: The ${obj}`,
+                text: `This is a ${obj}. The ${obj} is ${col}. I like this ${obj}. It is very nice.`,
+                keyword: `${col} ${obj}`,
+                answer: obj
+            });
+        }
+
+        let currentIdx = 0;
+
+        function render() {
+            const s = stories[currentIdx];
+            
+            // Update Title & Progress
+            document.getElementById('title-display').innerText = s.title;
+            document.getElementById('progress-bar').style.width = (currentIdx + 1) + "%";
+
+            // Update Text (Pink Bold)
+            document.getElementById('text-display').innerText = s.text;
+
+            // Update Image (Using a more stable Source)
+            const imgUrl = `https://source.unsplash.com/400x400/?${encodeURIComponent(s.keyword)},cartoon`;
+            // If Unsplash is slow, Pollinations fallback
+            const fallbackUrl = `https://image.pollinations.ai/prompt/cute%20cartoon%20${encodeURIComponent(s.keyword)}?width=400&height=400&nologo=true`;
+            document.getElementById('main-img').src = fallbackUrl;
+
+            // Update Question (Clean Empty Box)
+            document.getElementById('q-container').innerHTML = `
+                I can see a <input type="text" class="empty-box">. <br><br>
+                The color is ${colors[currentIdx % 10]}.
+            `;
+        }
+
+        function nav(dir) {
+            currentIdx += dir;
+            if(currentIdx < 0) currentIdx = 99;
+            if(currentIdx > 99) currentIdx = 0;
+            render();
+        }
+
+        function finishStory() {
+            // FIREWORKS!
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff007f', '#ffffff', '#00d2ff']
+            });
+
+            // Wait 1 second then go next
+            setTimeout(() => {
+                nav(1);
+            }, 1000);
+        }
+
+        function readStory() {
+            const msg = new SpeechSynthesisUtterance(stories[currentIdx].text);
+            msg.rate = 0.9;
+            window.speechSynthesis.speak(msg);
+        }
+
+        // Run on load
+        render();
+    </script>
+</body>
+</html>
